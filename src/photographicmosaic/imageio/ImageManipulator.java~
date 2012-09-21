@@ -52,10 +52,8 @@ public class ImageManipulator
 			catch(IOException e)
 			{
 				if(chances >= 3)
-				{
 					System.out.println("You aren't putting in the right path/filename for your picture.");
 					System.exit(1);
-				}
 			}
 				
 		System.out.println(image);
