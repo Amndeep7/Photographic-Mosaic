@@ -46,7 +46,7 @@ public class ImageManipulator
 			try
 			{
 				chances += 1;
-				image = ImageManipulator.getImage("photographicmosaic/imageio/test.jpg");
+				image = ImageManipulator.getImage("test.jpg");
 				doesNotHaveValidName = false;
 			}
 			catch(IOException e)
