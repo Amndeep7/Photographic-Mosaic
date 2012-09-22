@@ -63,10 +63,41 @@ public class ImageManipulator
 		return ret;
 	}
 
-	// perhaps include a method that identifies the average pixel values for portions of the image? maybe like this?
-	public static int[] averagePixelValuesPerArea(BufferedImage image, boolean grayscale, int x, int y, int width, int height)
+	public static int[] averagePixelValuesPerArea(BufferedImage image, boolean grayscale, int xstart, int ystart, int width, int height)
 	{
-		return null;
+		int[] ret = grayscale ? new int[1] : new int[3];
+		if(grayscale)
+		{
+			double temp = 0;
+			for(int y = ystart; y < height; y++)
+			{
+				for(int x = xstart; x < width; x++)
+				{
+					temp += image.getRGB(x, y) & 0x000000FF;
+				}
+			}
+
+			temp /= width * height;
+
+			ret[0] = (int) temp;
+		}
+		else
+		{
+			for(int y = ystart; y < height; y++)
+			{
+				for(int x = xstart; x < width; x++)
+				{
+					ret[0] += (image.getRGB(x, y) >> 16) & 0x000000FF;
+					ret[1] += (image.getRGB(x, y) >> 8) & 0x000000FF;
+					ret[2] += image.getRGB(x, y) & 0x000000FF;
+				}
+			}
+
+			ret[0] /= width * height;
+			ret[1] /= width * height;
+			ret[2] /= width * height;
+		}
+		return ret;
 	}
 
 	public static void main(String[] args)
@@ -75,6 +106,7 @@ public class ImageManipulator
 		boolean doesNotHaveValidName = true;
 		int chances = 0;
 		while(doesNotHaveValidName)
+		{
 			try
 			{
 				chances += 1;
@@ -89,9 +121,10 @@ public class ImageManipulator
 					System.exit(1);
 				}
 			}
+		}
 
 		System.out.println(image + " " + image.getWidth() + " " + image.getHeight());
-		
+
 		BufferedImage[][] mergearray1 = new BufferedImage[1][1];
 		mergearray1[0][0] = image;
 		BufferedImage[][] mergearray2 = new BufferedImage[1][5];
@@ -107,7 +140,7 @@ public class ImageManipulator
 				mergearray3[y][x] = image;
 			}
 		}
-		
+
 		BufferedImage test1 = createImage(mergearray1, 500, 500);
 		BufferedImage test2 = createImage(mergearray2, 500, 500);
 		BufferedImage test3 = createImage(mergearray3, 500, 500);
@@ -115,16 +148,46 @@ public class ImageManipulator
 		System.out.println(test1 + " " + test1.getWidth() + " " + test1.getHeight());
 		System.out.println(test2 + " " + test2.getWidth() + " " + test2.getHeight());
 		System.out.println(test3 + " " + test3.getWidth() + " " + test3.getHeight());
-		
-		try{
-		ImageIO.write(test1, "jpg", new File("test1.jpg"));
-		ImageIO.write(test2, "jpg", new File("test2.jpg"));
-		ImageIO.write(test3, "jpg", new File("test3.jpg"));
+
+		try
+		{
+			ImageIO.write(test1, "jpg", new File("test1.jpg"));
+			ImageIO.write(test2, "jpg", new File("test2.jpg"));
+			ImageIO.write(test3, "jpg", new File("test3.jpg"));
 		}
 		catch(IOException e)
 		{
 			System.out.println("The image didn't become written.");
 			System.exit(1);
 		}
+
+		BufferedImage black = null;
+		BufferedImage white = null;
+			try
+			{
+				black = ImageManipulator.getImage("black_test.jpg");
+				white = ImageManipulator.getImage("white_test.jpg");
+			}
+			catch(IOException e)
+			{
+					System.out.println("You aren't putting in the right path/filename for your picture.");
+					System.exit(1);
+			}
+
+		System.out.println(black + " " + black.getWidth() + " " + black.getHeight() + " " + averagePixelValues(black, false)[0] + " " + averagePixelValues(black, false)[1] + " " + averagePixelValues(black, false)[2]);
+		System.out.println(white + " " + white.getWidth() + " " + white.getHeight() + " " + averagePixelValues(white, false)[0] + " " + averagePixelValues(white, false)[1] + " " + averagePixelValues(white, false)[2]);
+
+		BufferedImage gray = null;
+		try
+		{
+			gray = ImageManipulator.getImage("gray_test.jpg");
+		}
+		catch(IOException e)
+		{
+				System.out.println("You aren't putting in the right path/filename for your picture.");
+				System.exit(1);
+		}
+		System.out.println(gray + " " + gray.getWidth() + " " + gray.getHeight() + " " + averagePixelValues(gray, true)[0]);
+
 	}
 }
