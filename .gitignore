@@ -1,0 +1,5 @@
+#Git stuff
+.gitignore~
+
+#Non-source code = irrelevant
+bin/*
