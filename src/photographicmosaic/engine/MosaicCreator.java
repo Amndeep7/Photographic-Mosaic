@@ -1,6 +1,5 @@
 package photographicmosaic.engine;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -46,22 +45,14 @@ public class MosaicCreator
 	public static MetaImage bestImage(double[] source, MetaImage[] images)
 	{
 		MetaImage best = images[0];
-		
-
-		double[] base = {0, 0, 0};
-
-		double distance = ImageManipulator.distance(source, best.getAverageValues());
-		//System.out.println("new best = " + distance + " with " + best + " that has a base value of " + ImageManipulator.distance(best.getAverageValues(), base));
-
+		double bestDistance = ImageManipulator.distance(source, best.getAverageValues());
 
 		for(MetaImage m : images)
 		{
-			distance = ImageManipulator.distance(source, m.getAverageValues());
-			//System.out.println(distance + " with " + m + " that has a base value of " + ImageManipulator.distance(m.getAverageValues(), base));
-			if(ImageManipulator.distance(source, m.getAverageValues()) < ImageManipulator.distance(source, best.getAverageValues()))
+			if(ImageManipulator.distance(source, m.getAverageValues()) < bestDistance)
 			{
 				best = m;
-				//System.out.println("new best = " + distance + " with " + m + " that has a base value of " + ImageManipulator.distance(m.getAverageValues(), base));
+				bestDistance = ImageManipulator.distance(source, best.getAverageValues());
 			}
 		}
 
@@ -73,8 +64,8 @@ public class MosaicCreator
 	public static void main(String[] args) throws Exception
 	{
 		//File imageDirectory = new File("/home/amn/Programming/Java/Photographic-Mosaic/ColorImages/");
-		//File imageDirectory = new File("/home/amn/RandomArtAssignmentPictures/2012/09/");
-		File imageDirectory = new File("/home/amn/Mom/");
+		File imageDirectory = new File("/home/amn/RandomArtAssignmentPictures/");
+		//File imageDirectory = new File("/home/amn/Mom/");
 		System.out.println("Found the directory");
 		MetaImage[] images = convertFromFilesToMetaImages(getImageFiles(imageDirectory));
 		System.out.println("This has probably taken quite some time.");
@@ -95,7 +86,7 @@ public class MosaicCreator
 
 		System.out.println("Got through preliminaries");
 
-		BufferedImage[][] selectedImages = new BufferedImage[rows][columns];
+		MetaImage[][] selectedImages = new MetaImage[rows][columns];
 
 		int y, x;
 		for(y = 0; y < rows; y++)
@@ -108,13 +99,13 @@ public class MosaicCreator
 				double[] ave = ImageManipulator.averagePixelValuesPerArea(source.getImage(), x * (width / columns), y * (height / rows), columnwidth, rowheight);
 				System.out.println(ImageManipulator.distance(ave, base) + " " + ave[0] + " " + ave[1] + " " + ave[2]);
 
-				selectedImages[y][x] = bestImage(ave, images).getImage();
+				selectedImages[y][x] = bestImage(ave, images);
 
 				System.out.println("Got through " + x + ", " + y);
 			}
 		}
 
-		ImageManipulator.makeImageFile("/home/amn/MOMMY.jpg", ImageManipulator.createImage(selectedImages, 5000, 5000));
+		ImageManipulator.makeImageFile("/home/amn/MOMMY2.jpg", ImageManipulator.createImage(selectedImages, 5000, 5000));
 		System.out.println("done.");
 	}
 

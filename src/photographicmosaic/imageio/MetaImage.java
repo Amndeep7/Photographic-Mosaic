@@ -1,18 +1,17 @@
 package photographicmosaic.imageio;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class MetaImage
 {
 	private String path;
-	private BufferedImage image;
 	private double[] averageColorValues;
 	
-	public MetaImage(String p) throws Exception
+	public MetaImage(String p) throws IOException
 	{
 		path = p;
-		image = ImageManipulator.getImage(path);
-		averageColorValues = ImageManipulator.averagePixelValues(image);
+		averageColorValues = ImageManipulator.averagePixelValues(ImageManipulator.getImage(path));
 	}
 	
 	public String toString()
@@ -24,9 +23,9 @@ public class MetaImage
 	{
 		return path;
 	}
-	public BufferedImage getImage()
+	public BufferedImage getImage() throws IOException
 	{
-		return image;
+		return ImageManipulator.getImage(path);
 	}
 	public double[] getAverageValues()
 	{
