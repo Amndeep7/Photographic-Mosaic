@@ -49,11 +49,14 @@ public class ImageManipulator
 	/**
 	 * Creates the final image from the selected images, the images should be in a matrix that represents how they will look in the final image.
 	 * 
-	 * @param subimages The selected subimages that make up the image
-	 * @param width The width of the final image, an integer representing the number of X pixels.
-	 * @param height The height of the final image, an integer representing the number of y pixels.
+	 * @param subimages
+	 *             The selected subimages that make up the image
+	 * @param width
+	 *             The width of the final image, an integer representing the number of X pixels.
+	 * @param height
+	 *             The height of the final image, an integer representing the number of y pixels.
 	 * @return A BufferedImage that is a composite image compiled from the subimages.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 
 	public static BufferedImage createImage(MetaImage[][] subimages, int width, int height) throws IOException
@@ -68,15 +71,16 @@ public class ImageManipulator
 		{
 			if(subimages[0].length == 0)
 			{
-				//System.out.println("0 and 0");
+				// System.out.println("0 and 0");
 				temp.createGraphics().drawImage(subimages[0][0].getImage(), 0, 0, tempwidth, tempheight, null);
 			}
 			else
 			{
 				for(int x = 0; x < subimages[0].length; x++)
 				{
-					//System.out.println("only columns " + x);
-					temp.createGraphics().drawImage(subimages[0][x].getImage(), x * tempwidth / subimages[0].length, 0, tempwidth / subimages[0].length, tempheight / subimages.length, null);
+					// System.out.println("only columns " + x);
+					temp.createGraphics().drawImage(subimages[0][x].getImage(), x * tempwidth / subimages[0].length, 0, tempwidth / subimages[0].length, tempheight / subimages.length,
+					          null);
 				}
 			}
 		}
@@ -86,14 +90,14 @@ public class ImageManipulator
 			{
 				for(int x = 0; x < subimages[y].length; x++)
 				{
-					//System.out.println("Adding in x:" + x + " y:" + y);
+					// System.out.println("Adding in x:" + x + " y:" + y);
 					temp.createGraphics().drawImage(subimages[y][x].getImage(), x * tempwidth / subimages[y].length, y * tempheight / subimages.length, tempwidth / subimages[y].length,
 					          tempheight / subimages.length, null);
 				}
 			}
 		}
 
-		//System.out.println("Final resize");
+		// System.out.println("Final resize");
 
 		BufferedImage ret = new BufferedImage(width, height, temp.getType());
 		ret.createGraphics().drawImage(temp, 0, 0, ret.getWidth(), ret.getHeight(), null);

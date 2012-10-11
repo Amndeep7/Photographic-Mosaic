@@ -12,7 +12,7 @@ import photographicmosaic.imageio.MetaImage;
 public class MosaicCreator
 {
 	static MetaImage[] metaimages;
-	
+
 	public static ArrayList<File> getImageFiles(File root)
 	{
 		ArrayList<File> images = new ArrayList<File>();
@@ -52,15 +52,17 @@ public class MosaicCreator
 					public void run()
 					{
 						System.out.println("hi");
-						try {
+						try
+						{
 							metaimages[xx] = new MetaImage(list.get(xx).getAbsolutePath());
-						} catch (IOException e) {
+						}
+						catch(IOException e)
+						{
 							e.printStackTrace();
 							System.exit(1);
 						}
 					}
-				}
-			);
+				});
 
 			System.out.println("Have finished converting " + x + " out of " + metaimages.length);
 		}
@@ -87,9 +89,9 @@ public class MosaicCreator
 
 	public static void main(String[] args) throws Exception
 	{
-		//File imageDirectory = new File("/home/amn/Programming/Java/Photographic-Mosaic/ColorImages/");
-		//File imageDirectory = new File("/home/amn/RandomArtAssignmentPictures/");
-		//File imageDirectory = new File("/home/amn/Mom/");
+		// File imageDirectory = new File("/home/amn/Programming/Java/Photographic-Mosaic/ColorImages/");
+		// File imageDirectory = new File("/home/amn/RandomArtAssignmentPictures/");
+		// File imageDirectory = new File("/home/amn/Mom/");
 		File imageDirectory = new File("/afs/csl.tjhsst.edu/students/2013/2013amann/SomePics/");
 		System.out.println(imageDirectory.exists() ? "Found the directory" : "Did not find the directory");
 		convertFromFilesToMetaImages(getImageFiles(imageDirectory));
@@ -101,8 +103,8 @@ public class MosaicCreator
 		{
 			System.out.println(i + " " + ImageManipulator.distance(i.getAverageValues(), base));
 		}
-		
-		//MetaImage source = new MetaImage("/home/amn/Programming/Java/Photographic-Mosaic/mom.jpg");
+
+		// MetaImage source = new MetaImage("/home/amn/Programming/Java/Photographic-Mosaic/mom.jpg");
 		MetaImage source = new MetaImage("/afs/csl.tjhsst.edu/students/2013/2013amann/ihnRuSQAn8rI.jpg");
 
 		int width = source.getImage().getWidth();
