@@ -7,6 +7,9 @@ package photographicmosaic.imageio;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javax.imageio.ImageIO;
 
 public class ImageManipulator
@@ -59,45 +62,104 @@ public class ImageManipulator
 	 * @throws IOException
 	 */
 
-	public static BufferedImage createImage(MetaImage[][] subimages, int width, int height) throws IOException
+	public static BufferedImage createImage(final MetaImage[][] subimages, int width, int height) throws IOException
 	{
 		System.out.println("Entered merging area");
 
-		int tempwidth = width - width % subimages[0].length;
-		int tempheight = height - height % subimages.length;
-		BufferedImage temp = new BufferedImage(tempwidth, tempheight, BufferedImage.TYPE_INT_RGB);
+		final int tempwidth = width - width % subimages[0].length;
+		final int tempheight = height - height % subimages.length;
+		final BufferedImage temp = new BufferedImage(tempwidth, tempheight, BufferedImage.TYPE_INT_RGB);
 
 		if(subimages.length == 0)
 		{
 			if(subimages[0].length == 0)
 			{
-				// System.out.println("0 and 0");
+				System.out.println("0 and 0");
 				temp.createGraphics().drawImage(subimages[0][0].getImage(), 0, 0, tempwidth, tempheight, null);
 			}
 			else
 			{
 				for(int x = 0; x < subimages[0].length; x++)
 				{
-					// System.out.println("only columns " + x);
+					System.out.println("only columns " + x);
 					temp.createGraphics().drawImage(subimages[0][x].getImage(), x * tempwidth / subimages[0].length, 0, tempwidth / subimages[0].length, tempheight / subimages.length,
-					          null);
+							null);
 				}
 			}
 		}
 		else
 		{
+			ExecutorService pool = Executors.newFixedThreadPool(subimages.length);
+			final BufferedImage[] temps = new BufferedImage[subimages.length];
+			for(int y = 0; y < temps.length; y++)
+				temps[y] = new BufferedImage(tempwidth, tempheight/subimages.length, BufferedImage.TYPE_INT_RGB);
+			
 			for(int y = 0; y < subimages.length; y++)
 			{
-				for(int x = 0; x < subimages[y].length; x++)
+				System.out.println("Commanding " + y);
+				final int yy = y;
+				pool.execute(new Runnable()
 				{
-					// System.out.println("Adding in x:" + x + " y:" + y);
-					temp.createGraphics().drawImage(subimages[y][x].getImage(), x * tempwidth / subimages[y].length, y * tempheight / subimages.length, tempwidth / subimages[y].length,
-					          tempheight / subimages.length, null);
+                         public void run()
+                         {
+                         	for(int x = 0; x < subimages[yy].length; x++)
+               			{
+               				System.out.println("Adding in x:" + x + " y:" + yy);
+               				try
+               				{
+               					temps[yy].createGraphics().drawImage(subimages[yy][x].getImage(), x * tempwidth / subimages[yy].length, 0, tempwidth / subimages[yy].length,
+               							tempheight / subimages.length, null);
+               				}
+               				catch(IOException e)
+               				{
+               					e.printStackTrace();
+               					System.exit(1);
+               				}
+               			}
+                         }
+					
+				});
+			}
+			
+			pool.shutdown();
+			while(!pool.isTerminated())
+			{
+				try
+				{
+					Thread.sleep(1000);
+					System.out.println("making subpictures");
+				}
+				catch(InterruptedException ie)
+				{
 				}
 			}
+			
+			for(int y = 0; y < subimages.length; y++)
+			{
+				System.out.println("Compiling subimage " + y);
+				temp.createGraphics().drawImage(temps[y], 0, y*tempheight/subimages.length, tempwidth, tempheight/subimages.length, null);
+			}
+			
+//			for(int y = 0; y < subimages.length; y++)
+//			{
+//				for(int x = 0; x < subimages[y].length; x++)
+//				{
+//					System.out.println("Adding in x:" + x + " y:" + y);
+//					try
+//					{
+//						temp.createGraphics().drawImage(subimages[y][x].getImage(), x * tempwidth / subimages[y].length, y * tempheight / subimages.length, tempwidth / subimages[y].length,
+//								tempheight / subimages.length, null);
+//					}
+//					catch(IOException e)
+//					{
+//						e.printStackTrace();
+//						System.exit(1);
+//					}
+//				}
+//			}
 		}
 
-		// System.out.println("Final resize");
+		System.out.println("Final resize");
 
 		BufferedImage ret = new BufferedImage(width, height, temp.getType());
 		ret.createGraphics().drawImage(temp, 0, 0, ret.getWidth(), ret.getHeight(), null);
